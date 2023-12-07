@@ -1,6 +1,6 @@
 ---
 title: "info201-final"
-author: "Erika Cui"
+author: "Erika Cui, Varsha Bharath, Nithika Yechuri"
 date: "2023-12-06"
 output: html_document
 ---
@@ -14,6 +14,31 @@ library(ggrepel)
 library(stringr)
 ```
 
+#### **Data Sources**
+
+Here is the first source we used: https://www.kaggle.com/datasets/paultimothymooney/zillow-house-price-data?selhttps%3A%2F%2Fwww.kaggle.com%2Fdatasets%2Fpaultimothymooney%2Fzillow-house-price-data%3Fselect=Sale_Prices_State.csvect%3DSale_Prices_State.csv&select=Sale_Prices_State.csv
+
+The second data: https://www.kaggle.com/datasets/kabhishm/united-states-counties-by-per-capita-income
+
+The third data: https://www.kaggle.com/datasets/neerajkld/realtor-real-estate-usa 
+
+#### **Variables**
+
+states: State name
+
+price: Price of the house
+
+SizeRank: The ranking of the state, depending on the size of region
+
+avg_price: Average price of a house in a certain state, after collecting all the price from each city in the               state
+
+price_category: Shows if the price of the house is considered "High", "Medium", or "Low"
+
+avg_pci: The average per capita income for each state
+
+#### **Load, Clean, Average**
+
+We first load the dataset. Then we select, the variables that were the most informational, and renamed them.
 
 ```{r}
 salePriceData <- read_delim("../data/Sale_Prices_State.csv")
@@ -23,7 +48,15 @@ salePrice <- salePriceData %>%
   rename(states = RegionName, price = `2020-02`)
 
 head(salePrice) 
+
+dim(salePrice)
+missing <- colSums(is.na(salePrice) | salePrice == "NA")
+print(missing)
 ```
+Summary: There are 49 rows, 3 columns, 0 missing values.
+
+
+Here is the plot of the data set. Organized by least to most pricey houses in the different states.
 
 ```{r}
 salePrice %>% 
@@ -34,9 +67,11 @@ salePrice %>%
   theme(legend.text = element_text(size = 7),
         legend.title = element_text(size = 10),
         legend.key.size = unit(0.5, "cm")) +
-  scale_y_continuous(labels = scales::comma)
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "House Price in Different States", x = "States", y = "Price")
 ```
 
+We load the second data, selecting the most useful columns.
 
 ```{r}
 countiesData <- read_delim("../data/counties_per_capita_income.csv")
@@ -44,7 +79,14 @@ countiesData <- read_delim("../data/counties_per_capita_income.csv")
 pciData <- countiesData %>% 
   select(states, pci)
 head(pciData)
+
+dim(pciData)
+missing <- colSums(is.na(pciData) | pciData == "NA")
+print(missing)
 ```
+Summary: 3231 rows, 2 columns, and 0 missing values.
+
+Piping the pciData down, the graph will show us the pattern between states and the pci. 
 
 ```{r}
 repeatStates <- pciData %>%
@@ -71,6 +113,7 @@ ggplot(aes(x = states, y = pci, fill = states)) +
   labs(title = "States Per Capita Income", x = "States", y = "Per Capita Income")
 ```
 
+This is the last data set we will use. Selecting the variables "states" (as that is the merge key) and "price".
 
 ```{r}
 reData <- read_delim("../data/realtor-data.zip.csv.zip")
@@ -81,17 +124,29 @@ realEstate <- reData %>%
   filter(states != "Puerto Rico")
 
 head(realEstate)
-```
 
+dim(realEstate)
+missing <- colSums(is.na(realEstate) | realEstate == "NA")
+print(missing)
+```
+Summary: 1179387 rows, 2 columns, 77 missing values in the column "price".
+
+There are many rows because this data includes multiple cities from each state. To simplify everything, we took all the cities in a state and averaged it out, taking that average as the average price of a house in that certain state.
 ```{r}
 realEstateAvg <- realEstate %>% 
   group_by(states) %>% 
   summarize(avg_price = mean(price)) %>% 
   filter(!is.na(avg_price))
 realEstateAvg
+
+dim(realEstateAvg)
+missing <- colSums(is.na(realEstateAvg) | realEstateAvg == "NA")
+print(missing)
 ```
+Summary: 14 rows, 2 columns, and 0 missing values.
 
 
+This dataset only has a selected amount of states, so this bar graph shows the average price of a house in those states, giving a visual representation.
 ```{r}
 realEstateAvg %>% 
   ggplot(aes(x = reorder(states, avg_price), y = avg_price)) +
@@ -100,6 +155,7 @@ realEstateAvg %>%
   labs(title = "Average House Prices in Selected States", x = "States", y = "Average Price")
 ```
 
+#### **Merge**
 
 ```{r}
 merge1 <- full_join(salePrice, realEstateAvg, by = "states")
@@ -122,7 +178,15 @@ merge1 <- merge1 %>%
   filter(states != "Virgin Islands")
 
 head(merge1)
+
+dim(merge1)
+missing <- colSums(is.na(merge1) | merge1 == "NA")
+print(missing)
 ```
+Summary: 50 rows, 3 columns, 0 missing values.
+
+
+With the merged data, some states in one data may not have an average price. To fix this, if it is detected that a state has a price but no average, it takes the price and moves it to the average. If the state has both a price and an average, it averages those two and sets the number to avg_price.
 
 ```{r}
 merge1 %>%
@@ -142,7 +206,12 @@ merge1 <- merge1 %>%
   mutate(price_category  = ifelse(avg_price < 200000, "Low",
                                ifelse(avg_price < 400000, "Medium", "High")))
 head(merge1)
+
+dim(merge1)
+missing <- colSums(is.na(merge1) | merge1 == "NA")
+print(missing)
 ```
+Summary:50 rows, 3 columns, 0 missing values.
 
 
 ```{r}
@@ -161,7 +230,13 @@ merge2 <- merge2 %>%
   filter(states != "Virgin Islands")
 
 head(merge2)
+
+dim(merge2)
+missing <- colSums(is.na(merge2) | merge2 == "NA")
+print(missing)
 ```
+Summary: 50 rows, 2 columns, 0 missing values.
+
 
 ```{r}
 merge2 %>%
@@ -185,7 +260,17 @@ merge3 <- merge3 %>%
   filter(states != "Virgin Islands")
 
 head(merge3)
+
+dim(merge3)
+missing <- colSums(is.na(merge3) | merge3 == "NA")
+print(missing)
 ```
+
+Summary: 51 rows, 5 columns, 1 missing value in "avg_price", 1 missing value in "price_category", and 1 missing 
+value in "avg_pci".
+
+
+#### **Story Line Graphs**
 
 ```{r}
 merge3 %>% 
@@ -259,11 +344,16 @@ ggplot(aes(x = region, y = avg_price, color = region)) +
   
 ```
 
+#### **Summarization Table**
 
 ```{r}
 finalData <- merge3 %>% 
   select(states, avg_pci, avg_price, price_category)
 
 head(finalData)
-```
 
+dim(finalData)
+missing <- colSums(is.na(finalData) | finalData == "NA")
+print(missing)
+```
+Summary: 51 columns, 4 columns, 1 missing value in "avg_pci", 1 missing value in "avg_price", and 1 missing value in "price_category".
