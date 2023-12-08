@@ -56,7 +56,7 @@ print(missing)
 Summary: There are 49 rows, 3 columns, 0 missing values.
 
 
-Here is the plot of the data set. Organized by least to most pricey houses in the different states.
+Here is the plot of the data set salePrice. Organized by least to most pricey houses in the different states.
 
 ```{r}
 salePrice %>% 
@@ -157,6 +157,8 @@ realEstateAvg %>%
 
 #### **Merge**
 
+This first merge is for the dataset salePrice and realEstateAvg by the key "states". With the merged data, some states in one data may not have an average price. To fix this, if it is detected that a state has a price but no average, it takes the price and moves it to the average. If the state has both a price and an average, it averages those two and sets the number to avg_price.
+
 ```{r}
 merge1 <- full_join(salePrice, realEstateAvg, by = "states")
 
@@ -186,8 +188,7 @@ print(missing)
 Summary: 50 rows, 3 columns, 0 missing values.
 
 
-With the merged data, some states in one data may not have an average price. To fix this, if it is detected that a state has a price but no average, it takes the price and moves it to the average. If the state has both a price and an average, it averages those two and sets the number to avg_price.
-
+This is the plot, showing the average house prices across the U.S states.
 ```{r}
 merge1 %>%
   mutate(states = factor(states, levels = states[order(avg_price)])) %>% 
@@ -201,6 +202,9 @@ merge1 %>%
   scale_y_continuous(labels = scales::comma) +
   labs(title = "Average Price for Houses Across the U.S", x = "States", y  = "Average Price")
 ```
+
+
+We decided to create a catergorical variable called "price_category". This lets us know whether the average prices of houses in a state is high, medium, or low. There is a threshold to indicate what is considered what.
 ```{r}
 merge1 <- merge1 %>% 
   mutate(price_category  = ifelse(avg_price < 200000, "Low",
@@ -214,6 +218,7 @@ print(missing)
 Summary:50 rows, 3 columns, 0 missing values.
 
 
+We then merged pciData and the first merged data by the states.
 ```{r}
 merge2 <- left_join(pciData, merge1, by = "states")
 
@@ -238,6 +243,7 @@ print(missing)
 Summary: 50 rows, 2 columns, 0 missing values.
 
 
+Here is the plot of the second merged dataset, comparing the different average PCI in the states. 
 ```{r}
 merge2 %>%
   mutate(states = factor(states, levels = states[order(avg_pci)])) %>% 
@@ -253,11 +259,13 @@ merge2 %>%
 ```
 
 
+To get a complete data set to answer story line questions, we merged merge1 and merge2 (the first and second merged data set).  
 ```{r}
 merge3 <- full_join(merge1, merge2, by = "states")
 
 merge3 <- merge3 %>% 
-  filter(states != "Virgin Islands")
+  filter(states != "Virgin Islands") %>% 
+  filter(states != "District of Columbia")
 
 head(merge3)
 
@@ -266,12 +274,14 @@ missing <- colSums(is.na(merge3) | merge3 == "NA")
 print(missing)
 ```
 
-Summary: 51 rows, 5 columns, 1 missing value in "avg_price", 1 missing value in "price_category", and 1 missing 
+Summary: 50 rows, 5 columns, 1 missing value in "avg_price", 1 missing value in "price_category", and 1 missing 
 value in "avg_pci".
 
 
 #### **Story Line Graphs**
 
+
+This graph helps answer one of the story line questions, which was: What is the minimal income to afford a house?
 ```{r}
 merge3 %>% 
   ggplot(aes(x = avg_pci, y = avg_price, label = states)) +
@@ -281,6 +291,8 @@ merge3 %>%
   labs(title = "Minimal Income to Afford a House in Different States", x = "Average PCI", y = "Average Price")
 ```
 
+
+To answer the question: "What are the top 10 more expensive states to buy a house?", we get the first 10 rows of the data and plot it, showing you the states and the prices. 
 ```{r}
 top10 <- merge3 %>% 
   arrange(desc(avg_price)) %>% 
@@ -293,18 +305,23 @@ ggplot(top10, (aes(x = reorder(states, -avg_price), y = avg_price))) +
   labs(title = "Top 10 Most Expensive States to Buy a House", x = "Average Price", y = "States")
 ```
 
+To answer the last question, we first select the top 5 states with the most expensive average house prices.
 ```{r}
 top5 <- merge3 %>% 
   arrange(desc(avg_price)) %>% 
   slice(1:5)
 ```
 
+
+Then we select the bottom 5 least expensive.
 ```{r}
 bot5 <- merge3 %>% 
   arrange(avg_price) %>% 
   slice(1:5)
 ```
 
+
+We will then put those two together and plot the graph, answering: "What is the income difference between the top 5 and bottom 5?". 
 ```{r}
 top5$group <- "Top 5"
 bot5$group <- "Bottom 5"
@@ -321,12 +338,14 @@ ggplot(mergeGroup, aes(x = reorder(states, avg_price), y = avg_price, fill = gro
 ```
 
 
+
+For this code, we made sure to add all the states in the U.S, then mkaing sure it gets assigned to the coast they are in. The plot shows what all the difference between the coasts' average prices visually.
 ```{r}
 regions <- function(states) {
-  ifelse(states %in% c("Washington", "Orgeon", "California", "Nevada"), "West Coast",
+  ifelse(states %in% c("Washington", "Orgeon", "California", "Nevada", "Alaska"), "West Coast",
          ifelse(states %in% c("Montana", "Idaho", "Wyoming", "Utah", "Colorado", "Arizona", "New Mexico"), "Mountain Coast",
                 ifelse(states %in% c("North Dakota", "South Dakota", "Nebraska", "Kansas", "Oklahoma", "Texas", "Minnesota", "Iowa", "Missouri", "Arkansas", "Louisiana", "Wisconsin", "Illinois", "Tennessee", "Mississippi", "Alabama", "Kentucky"), "Midwest Coast",
-                       ifelse(states %in% c("Michigan", "Indiana", "Ohio", "West Virginia", "Virginia", "Georgia", "Florida", "North Carolina", "South Carolina", "Pennsylvania", "New York", "Massachusetts", "Vermont", "New Hampshire", "Maine", "Rhode Island", "Conneticut", "New Jersey", "Delaware", "Maryland", "District of Columbia"), "East Coast", "Other"))))
+                       ifelse(states %in% c("Michigan", "Indiana", "Ohio", "West Virginia", "Virginia", "Georgia", "Florida", "North Carolina", "South Carolina", "Pennsylvania", "New York", "Massachusetts", "Vermont", "New Hampshire", "Maine", "Rhode Island", "Conneticut", "New Jersey", "Delaware", "Maryland"), "East Coast", "Hawaii"))))
 }
 
 merge3 <- merge3 %>% 
@@ -346,14 +365,23 @@ ggplot(aes(x = region, y = avg_price, color = region)) +
 
 #### **Summarization Table**
 
+
+Finally, this is the final data set that has been cleaned.
 ```{r}
 finalData <- merge3 %>% 
   select(states, avg_pci, avg_price, price_category)
 
-head(finalData)
+finalData
 
 dim(finalData)
 missing <- colSums(is.na(finalData) | finalData == "NA")
 print(missing)
 ```
-Summary: 51 columns, 4 columns, 1 missing value in "avg_pci", 1 missing value in "avg_price", and 1 missing value in "price_category".
+Summary: 50 columns, 4 columns, 1 missing value in "avg_pci", 1 missing value in "avg_price", and 1 missing value in "price_category".
+
+#### **Summary**
+
+Overall, the final data set has 50 columns, representing the 50 states. There are 4 columns, each being an important variable to the data. While the column "states" is clearly important because it lets us know what area we are talking about, avg_pci is also important. It is important because knowing what the average income an individual makes in an area, we can see what the economy is like and compare it to the average house prices. Talking about house prices, the column "avg_price" shows the average price of the houses in each state. Lastly, "price_category" lets us see what is considered "high", "medium", or "low" price for a house, according to threshold. There is one missing value for both "avg_price" and "price_category" and it is both from Alaska. It is understandable why there is no value for the "price_category" because without the average price, we cant determine what the range is. 
+
+
+
