@@ -1,10 +1,9 @@
 ---
-title: "test"
+title: "Data Documentation"
 author: "Erika Cui, Varsha Bharath, Nithika Yechuri"
 date: "2023-12-07"
 output: html_document
 ---
-
 **Introduction:**
 
   To provide some initial **context**, house pricing has drastically increased over the past few years, which has caused the housing market to be at an all-time low.  Based on what **we already know**, is that even though house prices are significantly lower from the  COVID years, the overall price ends up being much higher due to the high-interest rates buyers are now paying. It is also due to the fact that many people lost their jobs during COVID, causing there to be an average lower income in the USA. With the new prices now starting to up again, it typically takes a new buyer around 10 years minimum to pay off their mortgage. One thing we want to look into in our project is understanding how this affects people from different incomes. 
@@ -22,7 +21,7 @@ output: html_document
 **Explain your Data:**
 
   In total, our group used three data sets. The reason **why we used these datasets** was because we thought that they had all the data we needed regarding house prices based on states in the USA, the needed data regarding the prices per capita, and finally also had the individual average income of people in different states. All of our **datasets are from** and **collected** by Kaggle. The datasets are freely available to everyone, as there are no restrictions on who can view the data.
-  
+
   The first dataset, called Zillow House Price Data contains information about housing prices in various cities and states. The dataset includes details on rental prices for different types of housing situations over different time periods. One specific table, Sale_prices_state.csv, provides insights into the average house prices in each state from 2008 to 2020. It's a valuable resource for understanding how housing costs have evolved over time, allowing users to analyze trends and patterns in the real estate market across different states in the United States. 
 
   The second dataset is called Counties vs. PCI, and it's all about counties in America and their income stuff. It's got columns for things like the county name, the state it's in, and important money info like median household income and PCI (which stands for per capita income). You'll also find details on population size and the number of households in each county. Basically, it's a cool data set that helps you see how income is spread out across different counties in the U.S., so you can check out the money vibes in each place.
@@ -35,7 +34,7 @@ output: html_document
 
 **Explaining Methods and Data:**
 
-	In the provided Rmd file, several data processing and manipulation techniques were employed to handle multiple datasets. The code combines data from multiple sources, handles missing values, cleans and transforms data types, performs aggregations and summaries, merges datasets, and creates visualizations to explore and represent relationships between real estate prices, income, and geographical regions across various states in the United States.
+  In the provided Rmd file, several data processing and manipulation techniques were employed to handle multiple datasets. The code combines data from multiple sources, handles missing values, cleans and transforms data types, performs aggregations and summaries, merges datasets, and creates visualizations to explore and represent relationships between real estate prices, income, and geographical regions across various states in the United States.
 
   For our first dataset which we called **salePrice**, we only kept 3 variables from the columns included. These variables were called “RegionName”, “2020-2,” and “SizeRank”. We renamed “RegionName” to “State” as the values in this column were all names of the US States. We also renamed “2020-2” to price, as in this dataset, the original author collected data regarding the price of a given household for every month between 2008 and 2020. “2020-2” was the latest (therefore most accurate) price we decided to make conclusions regarding. Our second dataset was a dataset containing information about the financial status of counties in the US, which we called **countiesData**. From this dataset, we kept 2 variables which were the state name (states) and the per capita income of said state (PCI). 
 
