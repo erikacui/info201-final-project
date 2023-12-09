@@ -53,29 +53,33 @@ We created many graphs that answer various parts of our questions mentioned abov
 
 **Graph 1:**
 
-![](dataset1.png)
+<img width="567" alt="dataset1" src="https://github.com/erikacui/info201-final-project/assets/108850622/532f7581-d1bf-492a-9259-e9e1b61c3862">
+
 
 **Graph 2:**
 
-![](dataset2.png)
+<img width="593" alt="dataset2" src="https://github.com/erikacui/info201-final-project/assets/108850622/0b65c817-cab7-43ca-b04b-8f3a5369ed44">
+
 
 **Graph 3:**
 
-![](average-price.png)
+<img width="601" alt="average-price" src="https://github.com/erikacui/info201-final-project/assets/108850622/e6694b31-1f01-4029-ab32-37aa6eeb5c24">
+
 
 **Graph 4:**
 
-
-![](story1.png)
+<img width="653" alt="story1" src="https://github.com/erikacui/info201-final-project/assets/108850622/dc68deec-cab2-4686-96d0-47bb149941f1">
 
 
 **Graph 5:**
 
-![](story3.png)
+<img width="570" alt="story3" src="https://github.com/erikacui/info201-final-project/assets/108850622/4cdc01ad-4954-4711-8427-8324f7b10565">
+
 
 **Graph 6:**
 
-![](region.png)
+<img width="587" alt="region" src="https://github.com/erikacui/info201-final-project/assets/108850622/08b5e11e-5424-4786-bde2-979bc355668f">
+
 
 **Discuss your findings:**
 
